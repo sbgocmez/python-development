@@ -5,9 +5,11 @@ from pydantic import BaseModel
 from typing import Optional
 from fastapi import status
 from fastapi import HTTPException
+# import psycopg2
 
 app = FastAPI()
 
+#conn = psycopg2.connect(host='0.0.0.0', database='postgres', user='postgres', password='fastapi24')
 class Post(BaseModel):
     title: str
     content: str
