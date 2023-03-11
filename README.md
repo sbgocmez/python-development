@@ -42,6 +42,11 @@ delete : delete
 Create Docker container with postgres image. It can be installed locally too, but I choose to use Docker.
 
 ```
+# first way
+docker run --name fastapi -e POSTGRES_PASSWORD=fastapi24 -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres
+```
+```
+#second way
 docker volume create --name {your_volume_name} -d local
 docker run -it --rm --name {your_container_name} -e POSTGRES_USER="{your_user_name}" -ePOSTGRES_PASSWORD="{your_password}"" -e POSTGRES_DB="{your_db_name}"" -v {your_volume_name}:/var/lib/{your_container_name}/data -p 5432:5432 postgres:latest
 ```
