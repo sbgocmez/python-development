@@ -12,3 +12,4 @@ Tools for robust API development:
 -Deployment: Ubuntu/Heroku, cloud services.
 -Dockerize
 -CI/CD pipeline, Github actions.
+-Spoonacular API is used for database setup
