@@ -7,18 +7,29 @@ from fastapi import status
 from fastapi import HTTPException
 import psycopg2.extras
 
+global conn, cursor, menu
 
 app = FastAPI()
 
 class Food(BaseModel):
-    name: str
-    image: bytes
-    price: int
-    cuisine_id: int
-    tried: bool = False
-    rating: Optional[int] = None
+    def __init__(self, nm: str, im: bytes, pr: int, rt: Optional[int], tr: bool, cu: int):
+        self.name = nm
+        self.image = im
+        self.price = pr
+        self.rating = rt
+        self.tried = tr
+        self.cuisine = cu
+    
+class CuisineMenu(BaseModel):
+    def __init__(self, cuisine: str, foods: list(Food)):
+        self.cuisine = cuisine
+        self.foods = foods
 
-global conn, cursor
+
+class Menu(BaseModel):
+    def __init__(self, menus: list(CuisineMenu)):
+        self.menus = menus
+
 def database_connection():
     global conn, cursor
     try:
@@ -32,6 +43,33 @@ categories = {0:"breakfast", 1:"lunch", 2:"dinner"}
 my_posts = [{"title":"Sunny side-up", "content":"One egg, butter, salt", "category":0, "published":True, "rating": 4, "id":1},
             {"title":"Scrumbled eggs with Croissant", "content":"One egg, butter, salt, flour, sugar, milk, yeast", "category":1, "published":True, "rating": 5, "id":2},
             {"title":"Pesto Penne", "content":"penne pasta, basit pesto, salt, black pepper, cherry tomatoes, parmesan cheese", "category":2, "published":False, "rating": 5, "id": 3}]
+
+
+def create_menu():
+    global conn, cursor
+    menu = []
+    cuisine_menu = []
+    sql_query = """SELECT * FROM foods"""
+    cursor.execute(sql_query)
+
+    food_records = cursor.fetchall()
+
+    current_cuisine = food_records[0][5]
+    for food in food_records:
+        nm, im, pr, rt, tr, cu = food[0], food[1], food[2], food[3], food[4], food[5]
+        food_obj = Food(nm, im, pr, rt, tr, cu)
+        
+        cuisine_menu.append(food_obj)
+        if (current_cuisine != cu):
+            print("I am here and food name is : ", nm)
+            print("I am here and food name is : ", food_obj.name)
+
+            current_cuisine = cu
+            menu.append(cuisine_menu)
+            cuisine_menu = []
+            cuisine_menu.append(food_obj)
+
+        
 
 
 # def create_menu():
