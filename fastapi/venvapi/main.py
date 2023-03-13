@@ -5,17 +5,28 @@ from pydantic import BaseModel
 from typing import Optional
 from fastapi import status
 from fastapi import HTTPException
-import psycopg2
+import psycopg2.extras
+
 
 app = FastAPI()
 
-conn = psycopg2.connect(host='0.0.0.0', database='postgres', user='postgres', password='fastapi24')
-class Post(BaseModel):
-    title: str
-    content: str
-    category: int
-    published: bool = True
+class Food(BaseModel):
+    name: str
+    image: bytes
+    price: int
+    cuisine_id: int
+    tried: bool = False
     rating: Optional[int] = None
+
+global conn, cursor
+def database_connection():
+    global conn, cursor
+    try:
+        conn = psycopg2.connect(host='0.0.0.0', database='postgres', user='postgres', password='fastapi24', cursor_factory=psycopg2.extras.RealDictCursor)
+        cursor = conn.cursor()
+        print("[INFO main.py] Database connection is succesfull!")
+    except Exception as e:
+        print("[INFO main.py] Database connection is failed! ", e)
 
 categories = {0:"breakfast", 1:"lunch", 2:"dinner"}
 my_posts = [{"title":"Sunny side-up", "content":"One egg, butter, salt", "category":0, "published":True, "rating": 4, "id":1},
@@ -23,8 +34,16 @@ my_posts = [{"title":"Sunny side-up", "content":"One egg, butter, salt", "catego
             {"title":"Pesto Penne", "content":"penne pasta, basit pesto, salt, black pepper, cherry tomatoes, parmesan cheese", "category":2, "published":False, "rating": 5, "id": 3}]
 
 
-def find_post_by_id(id):
-    for post in my_posts:
+# def create_menu():
+#     global conn, cursor
+#     sql_query = 
+
+
+database_connection() # start connection
+create_menu() # create menu from database
+
+def find_food_by_id(id):
+    for food in my_foods:
         if post["id"] == id:
             return post
 
